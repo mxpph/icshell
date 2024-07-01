@@ -1,0 +1,16 @@
+|
+<
+>
+<<
+>>
+<<<<<
+>>>
+echo <
+echo asd <
+ls | cat <
+ls < | cat
+ls | > >>
+ls | |
+echo | "|"
+| cat
+echo a | >> ../files/outfile >>

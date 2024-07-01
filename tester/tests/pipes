@@ -1,0 +1,3 @@
+cat ./files/input | grep nibh
+echo llol lol lol | hexdump
+echo $PATH | wc -l | cat

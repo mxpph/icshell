@@ -1,0 +1,41 @@
+echo icshell
+echo "icshell is the best"
+echo 'icshell is bug-free'
+echo ic'shellz'
+echo ic""shelled
+echo ''
+echo "squote in dquote->'"
+echo "squote in dquote again->' "
+echo 'dquote in squotes ->"'
+echo 'dquote in squotes again-> " '
+echo '$'
+echo "$"
+echo $
+echo "$PWD"
+echo '$SHLVL'
+echo $?
+echo $?HELLO
+echo "> >> < * ? [ ] | ; [ ] || && ( ) & # $ \ <<"
+echo '> >> < * ? [ ] | ; [ ] || && ( ) & # $ \ <<'
+echo "exit->$? home->$HOME user->$USER"
+echo 'exit->$? home->$HOME user->$USER'
+export hello
+export HELLO=123
+export A-
+export HELLO=123 A
+export HELLO="123 A-"
+export hello world
+export HELLO-=123
+export =
+export 123
+unset
+unset HELLO
+unset HELLO1 HELLO2
+unset HOME
+unset PATH
+unset SHELL
+pwd
+pwd oi
+cd $PWD
+cd $PWD hi
+cd 123123

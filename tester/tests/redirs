@@ -1,0 +1,16 @@
+grep consequat <./files/input
+grep Magna <nofile <./files/input
+cat <"abc""def""ghi"
+echo <nofile <./files/input <nofile
+cat <nofile
+cat <nofile
+echo <123 <456 hi | echo "icshell"
+echo whoread > ./files/outfile
+echo >> ./files/outfile this lol
+echo ilovewritingtests >> ./files/outfile
+cat <./files/input|ls
+cat <./files/input>>./files/outfile
+cat <./files/denied
+ls >> ./files/denied
+ls >>./files/denied >>./files/outfile
+ls >> ./files/outfile
