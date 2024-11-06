@@ -181,13 +181,13 @@ void execute_node(parsenode_t *cmd, int fd_track)
     switch (cmd->type)
     {
         case EXEC:
-            run_exec(cmd->data->exec);
+            run_exec(cmd->exec);
             break;
         case REDIR:
-            run_redir(cmd->data->redir, fd_track);
+            run_redir(cmd->redir, fd_track);
             break;
         case PIPE:
-            run_pipe(cmd->data->pipe, fd_track);
+            run_pipe(cmd->pipe, fd_track);
             break;
         default:
             error_exit("unrecognized command", EXIT_FAILURE);

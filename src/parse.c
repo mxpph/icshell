@@ -41,10 +41,8 @@ static parsenode_t *new_execnode(void)
     new = malloc(sizeof(*new));
     assert(new);
     new->type = EXEC;
-    new->data = malloc(sizeof(*new->data));
-    assert (new->data);
-    new->data->exec = calloc(1, sizeof(*new->data->exec));
-    assert (new->data->exec);
+    new->exec = calloc(1, sizeof(*new->exec));
+    assert (new->exec);
     return new;
 }
 
@@ -57,15 +55,13 @@ static parsenode_t *new_redirnode(char *file, int fd, lextype_t type, int mode,
     new = malloc(sizeof(*new));
     assert(new);
     new->type = REDIR;
-    new->data = malloc(sizeof(*new->data));
-    assert(new->data);
-    new->data->redir = malloc(sizeof(*new->data->redir));
-    assert(new->data->redir);
-    new->data->redir->file = file;
-    new->data->redir->fd = fd;
-    new->data->redir->type = type;
-    new->data->redir->mode = mode;
-    new->data->redir->cmd = cmd;
+    new->redir = malloc(sizeof(*new->redir));
+    assert(new->redir);
+    new->redir->file = file;
+    new->redir->fd = fd;
+    new->redir->type = type;
+    new->redir->mode = mode;
+    new->redir->cmd = cmd;
     return new;
 }
 
@@ -76,12 +72,10 @@ static parsenode_t *new_pipenode(parsenode_t *left, parsenode_t *right)
     new = malloc(sizeof(*new));
     assert(new);
     new->type = PIPE;
-    new->data = malloc(sizeof(*new->data));
-    assert(new->data);
-    new->data->pipe = malloc(sizeof(*new->data->pipe));
-    assert(new->data->pipe);
-    new->data->pipe->left = left;
-    new->data->pipe->right = right;
+    new->pipe = malloc(sizeof(*new->pipe));
+    assert(new->pipe);
+    new->pipe->left = left;
+    new->pipe->right = right;
     return new;
 }
 
@@ -90,17 +84,16 @@ static void next_exec_arg(parsenode_t *cmd, lexeme_t *lexeme)
     int argc;
 
     while (cmd->type == REDIR)
-        cmd = cmd->data->redir->cmd;
+        cmd = cmd->redir->cmd;
     argc = 0;
-    if (cmd->data->exec->argv)
+    if (cmd->exec->argv)
     {
-        while (cmd->data->exec->argv[argc])
+        while (cmd->exec->argv[argc])
             argc++;
     }
-    cmd->data->exec->argv = realloc(cmd->data->exec->argv,
-                                    sizeof(char *) * (argc + 2));
-    cmd->data->exec->argv[argc] = lexeme->content;
-    cmd->data->exec->argv[argc + 1] = NULL;
+    cmd->exec->argv = realloc(cmd->exec->argv, sizeof(char *) * (argc + 2));
+    cmd->exec->argv[argc] = lexeme->content;
+    cmd->exec->argv[argc + 1] = NULL;
 }
 
 static parsenode_t *parse_heredoc(char *delim, parsenode_t *scmd)
@@ -193,10 +186,10 @@ static parsenode_t *parse_exec(lexeme_t **cur)
             syntax_error(lexeme->content);
         if (cmd->type == EXEC)
         {
-            cmd->data->exec->argv = realloc(cmd->data->exec->argv,
-                                            sizeof(char *) * (argc + 2));
-            cmd->data->exec->argv[argc] = lexeme->content;
-            cmd->data->exec->argv[argc + 1] = NULL;
+            cmd->exec->argv = realloc(cmd->exec->argv,
+                                      sizeof(char *) * (argc + 2));
+            cmd->exec->argv[argc] = lexeme->content;
+            cmd->exec->argv[argc + 1] = NULL;
         }
         else if (cmd->type == REDIR)
             next_exec_arg(cmd, lexeme);
@@ -214,8 +207,8 @@ static parsenode_t *parse_pipe(lexeme_t **cur)
     if (peek(cur, PIPELINE))
     {
         take(cur);
-        if (!*cur || peek(cur, PIPELINE) || (node->type == EXEC
-            && !node->data->exec->argv))
+        if (!*cur || peek(cur, PIPELINE) 
+            || (node->type == EXEC && !node->exec->argv))
         {
             syntax_error("|");
         }
@@ -238,26 +231,26 @@ void    debug_parsetree(parsenode_t *node, int depth)
         return;
     if (node->type == PIPE)
     {
-        debug_parsetree(node->data->pipe->right, depth + 4);
+        debug_parsetree(node->pipe->right, depth + 4);
         for (int i = 0; i < depth; i++)
             fputc(' ', stderr);
         fputs("PIPE\n", stderr);
-        debug_parsetree(node->data->pipe->left, depth + 4);
+        debug_parsetree(node->pipe->left, depth + 4);
     }
     else if (node->type == REDIR)
     {
         for (int i = 0; i < depth; i++)
             fputc(' ', stderr);
-        fprintf(stderr, "REDIR(%s)-->", node->data->redir->file);
-        debug_parsetree(node->data->redir->cmd, 0);
+        fprintf(stderr, "REDIR(%s)-->", node->redir->file);
+        debug_parsetree(node->redir->cmd, 0);
     }
     else if (node->type == EXEC)
     {
         for (int i = 0; i < depth; i++)
             fputc(' ', stderr);
         fputs("EXEC:", stderr);
-        for (int i = 0; node->data->exec->argv[i]; i++)
-            fprintf(stderr,"%s ", node->data->exec->argv[i]);
+        for (int i = 0; node->exec->argv[i]; i++)
+            fprintf(stderr,"%s ", node->exec->argv[i]);
         fputc('\n', stderr);
     }
 }

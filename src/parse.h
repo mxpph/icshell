@@ -14,7 +14,6 @@ typedef enum
 } nodetype_t;
 
 typedef struct parsenode_t parsenode_t;
-typedef union  nodedata_u  nodedata_u;
 typedef struct exec_t      exec_t;
 typedef struct pipe_t      pipe_t;
 typedef struct redir_t     redir_t;
@@ -44,17 +43,15 @@ struct redir_t
     parsenode_t *cmd;
 };
 
-union nodedata_u
-{
-    pipe_t  *pipe;
-    redir_t *redir;
-    exec_t  *exec;
-};
-
 struct parsenode_t
 {
     nodetype_t type;
-    nodedata_u *data;
+    union
+    {
+        pipe_t  *pipe;
+        redir_t *redir;
+        exec_t  *exec;
+    };
 };
 
 parsenode_t *parse_create(lexlist_t *);
