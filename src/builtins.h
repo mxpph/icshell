@@ -8,6 +8,6 @@
 
 int     builtins_handle(lexeme_t *);
 void    builtins_infork(exec_t *);
-int     set_pwd(char *);
+void    set_pwd(char *);
 
 #endif

@@ -25,20 +25,16 @@ static int invalid_syntax(lexeme_t *argv)
     return 0;
 }
 
-int set_pwd(char *key)
+void set_pwd(char *key)
 {
     char    *cwd;
 
     cwd = getcwd(NULL, 0);
     if (!cwd)
-    {
         error_exit("cd: error retrieving current directory: getcwd",
                         EXIT_FAILURE);
-        return 1;
-    }
     setenv(key, cwd, 1);
     free(cwd);
-    return 0;
 }
 
 static void builtins_cd(lexeme_t *argv)
@@ -75,8 +71,7 @@ static void builtins_cd(lexeme_t *argv)
     }
     else
         dir = argv->content;
-    if (set_pwd("OLDPWD"))
-        return;
+    set_pwd("OLDPWD");
     if (chdir(dir) == -1)
     {
         fprintf(stderr, ICSHELL_NAME": cd: %s: ", dir);
@@ -84,8 +79,7 @@ static void builtins_cd(lexeme_t *argv)
         gstate.exitstatus = EXITCODE(EXIT_FAILURE);
         return;
     }
-    if (set_pwd("PWD"))
-        return;
+    set_pwd("PWD");
     gstate.exitstatus = EXITCODE(EXIT_SUCCESS);
 }
 
