@@ -134,6 +134,8 @@ static parsenode_t *parse_heredoc(char *delim, parsenode_t *scmd)
                          O_RDONLY, scmd);
 }
 
+/* REDIRNODE ::= [REDIR_IN | REDIR_OUT | HERE_DOC | REDIR_APP] WORD [REDIRNODE]
+ */
 static parsenode_t *parse_redir(parsenode_t *cmd, lexeme_t **cur)
 {
     lexeme_t    *redir, *next;
@@ -158,16 +160,19 @@ static parsenode_t *parse_redir(parsenode_t *cmd, lexeme_t **cur)
                 cmd = parse_heredoc(next->content, cmd);
                 break;
             case REDIR_APP:
-            default:
                 cmd = new_redirnode(next->content, STDOUT_FILENO, REDIR_APP,
                                     O_WRONLY | O_CREAT | O_APPEND, cmd);
                 break;
+            default: /* should be impossible to end up here */
+                error_exit("unexpected type when parsing redirection",
+                           EXIT_FAILURE);
         }
     }
     return cmd;
 }
 
 
+/* EXECNODE ::= [REDIRNODE] WORD+ [REDIRNODE] */
 static parsenode_t *parse_exec(lexeme_t **cur)
 {
     int         argc;
@@ -199,6 +204,7 @@ static parsenode_t *parse_exec(lexeme_t **cur)
     return cmd;
 }
 
+/* PIPENODE ::= EXECNODE | EXECNODE PIPELINE PIPENODE */
 static parsenode_t *parse_pipe(lexeme_t **cur)
 {
     parsenode_t *node;
@@ -207,7 +213,7 @@ static parsenode_t *parse_pipe(lexeme_t **cur)
     if (peek(cur, PIPELINE))
     {
         take(cur);
-        if (!*cur || peek(cur, PIPELINE) 
+        if (!*cur || peek(cur, PIPELINE)
             || (node->type == EXEC && !node->exec->argv))
         {
             syntax_error("|");
